@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/mitch000001/go-hbci"
 	"github.com/mitch000001/go-hbci/client"
 	"github.com/mitch000001/go-hbci/domain"
 	"github.com/mitch000001/go-hbci/iban"
@@ -15,10 +16,14 @@ var sepaTestAccount domain.InternationalAccountConnection
 
 func main() {
 
+	hbci.SetDebugMode(true)
+	hbci.SetInfoLog(true)
+
 	config := client.Config{
-		AccountID: os.Getenv("GOHBCI_USERID"),
-		BankID:    os.Getenv("GOHBCI_BLZ"),
-		PIN:       os.Getenv("GOHBCI_PIN"),
+		AccountID:          os.Getenv("GOHBCI_USERID"),
+		BankID:             os.Getenv("GOHBCI_BLZ"),
+		PIN:                os.Getenv("GOHBCI_PIN"),
+		EnableDebugLogging: true,
 	}
 
 	testAccount = domain.AccountConnection{AccountID: config.AccountID, CountryCode: 280, BankID: config.BankID}
@@ -43,8 +48,11 @@ func main() {
 		StartDate: domain.NewShortDate(time.Now().AddDate(0, 0, -90)),
 	}
 
-	// Get Transactions
+	// Get Accounts
 	accounts, _ := c.Accounts()
+	fmt.Printf("Accounts: %s\n", accounts)
+
+	// Get Transactions
 	if len(accounts) > 0 {
 		transactions, err := c.AccountTransactions(accounts[0].AccountConnection, timeframe, false, "")
 
@@ -60,6 +68,8 @@ func main() {
 	// Get SepaTransactions
 	sepaTransactions, err := c.SepaAccountTransactions(sepaTestAccount, timeframe, false, "")
 
+	fmt.Println("-------------------------------- SepaAccountTransactions -----------------------------")
+
 	if err != nil {
 		fmt.Printf("SepaAccountTransactions: %T:%v\n", err, err)
 	}
@@ -68,8 +78,11 @@ func main() {
 		fmt.Printf("Transaction: %s\n", tr)
 	}
 
-	// Get balances
+	// Get SepaAccountBalances
 	balances, err := c.SepaAccountBalances(sepaTestAccount, false, "")
+
+	fmt.Println("-------------------------------- SepaAccountBalances -----------------------------")
+
 	if err != nil {
 		fmt.Printf("SepaAccountBalances: %T:%v\n", err, err)
 	}

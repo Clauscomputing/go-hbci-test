@@ -2,7 +2,7 @@ module go-hbci-test
 
 go 1.21.5
 
-replace github.com/mitch000001/go-hbci => ../go-hbci
+replace github.com/mitch000001/go-hbci => ../go-hbci-v7
 
 require github.com/mitch000001/go-hbci v0.4.0
 
